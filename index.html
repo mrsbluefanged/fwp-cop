@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ffffff">
+<title>FWP CoP | Learn Together</title>
+<style>
+:root{
+  --royal:#3f51b5;
+  --sky:#29a9e1;
+  --green:#08bf57;
+  --yellow:#f6c400;
+  --ink:#203145;
+  --muted:#5b6f78;
+  --paper:#f7f9fc;
+  --line:#d6dde6;
+  font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  color:var(--ink);
+  background:var(--paper);
+  font-size:18px;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--paper)}
+button,textarea{font:inherit}
+button{cursor:pointer}
+button:focus-visible,textarea:focus-visible{outline:4px solid var(--yellow);outline-offset:3px}
+button:disabled{cursor:not-allowed;opacity:.52}
+textarea{width:100%;min-height:105px;border:2px solid #bfd0e0;border-radius:16px;padding:14px;background:#fff;color:var(--ink);font-size:18px;line-height:1.45;resize:vertical}
+.shell{width:min(100%,560px);margin:auto;min-height:100vh;display:flex;flex-direction:column;padding:0 18px 22px}
+.top{display:flex;align-items:center;gap:12px;padding:18px 0 14px}
+.backtop{width:42px;height:42px;border:0;background:#fff;color:var(--royal);font-size:30px;line-height:1;border-radius:12px;box-shadow:0 1px 0 rgba(0,0,0,.06)}
+.bar{flex:1;height:15px;border-radius:99px;background:#d9e3ef;overflow:hidden}
+.fill{width:0%;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green),var(--sky));transition:width .25s}
+.count{font-size:15px;font-weight:850;color:var(--royal);white-space:nowrap}
+.content{flex:1}
+.eyebrow{color:var(--royal);font-size:15px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin:12px 0 10px}
+h1{font-size:clamp(31px,8vw,45px);line-height:1.1;letter-spacing:-.035em;margin:0 0 12px;font-weight:900}
+p{line-height:1.5;margin:9px 0 16px;font-size:18px}
+.sub{color:var(--muted)}
+.hero-card,.summary-card,.bubble,.success{background:#fff;border-radius:22px;box-shadow:0 1px 0 rgba(0,0,0,.05)}
+.hero-card{padding:0;overflow:hidden;border:1px solid var(--line);margin:16px 0 10px}
+.tile-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.tile{aspect-ratio:1/1;position:relative;overflow:hidden}
+.tile.yellow{background:var(--yellow)}
+.tile.green{background:var(--green)}
+.tile.sky{background:var(--sky)}
+.tile.royal{background:var(--royal)}
+.circle:before,.ring:before,.diamond:before,.dots:before,.dots:after,.heart:before,.heart:after{content:"";position:absolute}
+.circle:before{width:62%;height:62%;border-radius:50%;background:var(--yellow);left:19%;top:19%}
+.ring:before{width:62%;height:62%;border-radius:50%;border:18px solid #fff;left:19%;top:19%}
+.diamond:before{width:44%;height:44%;background:var(--sky);transform:rotate(45deg);left:28%;top:28%}
+.dots:before{inset:0;background-image:radial-gradient(#fff 0 2px,transparent 3px);background-size:22px 22px;background-position:9px 9px;opacity:.95}
+.dots.green-dots:before{background-image:radial-gradient(var(--green) 0 2px,transparent 3px)}
+.heart:before,.heart:after{width:28%;height:44%;background:var(--yellow);border-radius:40px 40px 0 0;top:25%}
+.heart:before{left:24%;transform:rotate(-45deg);transform-origin:100% 100%}
+.heart:after{right:24%;transform:rotate(45deg);transform-origin:0 100%}
+.hero-band{background:var(--royal);color:#fff;padding:18px 20px}
+.hero-band strong{display:block;font-size:24px;line-height:1.15;margin-bottom:6px}
+.hero-band span{font-size:16px;line-height:1.35;color:#eef2ff}
+.bubble{border:2px solid var(--line);padding:18px 18px;margin:18px 0}
+.bubble strong{display:block;font-size:23px;line-height:1.32}
+.bubble p{margin-bottom:0}
+.note-box{background:#fffbe8;border:2px solid #f1d55c;color:#7a6000;padding:12px 14px;border-radius:14px;font-size:16px;margin:16px 0}
+.fieldlabel{display:block;font-weight:850;font-size:18px;margin:18px 0 8px}
+.fieldhint{font-size:15px;color:var(--muted);margin:0 0 9px}
+.options{display:grid;gap:11px;margin:18px 0}
+.option{min-height:74px;border:2px solid #cfd9e8;border-bottom-width:5px;border-radius:18px;background:#fff;display:flex;align-items:center;text-align:left;gap:12px;padding:14px 15px;font-size:18px;font-weight:760;line-height:1.28;color:var(--ink)}
+.option:active{transform:translateY(2px);border-bottom-width:3px}
+.option.selected{border-color:var(--royal);background:#eef1ff;color:#1f2b67}
+.tick{height:30px;width:30px;flex:0 0 30px;border:2px solid #b3c0d3;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;color:transparent;background:#fff}
+.selected .tick{background:var(--green);border-color:var(--green);color:#fff}
+.footer{padding:12px 0 max(10px,env(safe-area-inset-bottom));margin-top:16px}
+.primary{display:block;width:100%;min-height:62px;border:0;border-radius:16px;border-bottom:5px solid #2443a3;background:var(--royal);color:#fff;font-weight:900;font-size:19px;letter-spacing:.025em}
+.primary:active{border-bottom-width:2px;transform:translateY(3px)}
+.secondary{display:block;border:0;background:transparent;color:var(--royal);font-size:16px;padding:14px;width:100%;font-weight:800}
+.status{font-weight:850;color:var(--royal);font-size:18px;margin:12px 0 0}
+.tier{font-weight:850;color:#1d693a;font-size:17px;margin:8px 0 12px}
+.success{border:2px solid #98d8ad;background:#e9f8ee;padding:15px 16px;color:#175e33;margin:18px 0}
+.success strong{font-size:21px;display:block}
+.success p{margin:5px 0 0;font-size:17px}
+.bigdone{display:flex;justify-content:center;margin:8px 0 14px}
+.emblem{width:88px;height:88px;display:grid;grid-template-columns:repeat(2,1fr);border-radius:22px;overflow:hidden;border:1px solid var(--line);background:#fff;box-shadow:0 1px 0 rgba(0,0,0,.05)}
+.emblem .tile{aspect-ratio:auto}
+.final-quote{border-left:6px solid var(--green);background:#fff;border-radius:14px;padding:16px 18px;font-size:22px;font-weight:850;line-height:1.35;margin:18px 0}
+.summary-card{border:1px solid var(--line);overflow:hidden;margin:18px 0 8px}
+.summary-head{background:var(--royal);color:#fff;padding:18px 20px}
+.summary-head strong{display:block;font-size:27px;line-height:1.1}
+.summary-head span{display:block;margin-top:6px;font-size:17px;color:#eef2ff}
+.summary-body{padding:18px 20px;background:#fff}
+.summary-block{margin:0 0 18px}
+.summary-block:last-child{margin-bottom:0}
+.summary-label{display:block;font-size:17px;font-weight:900;color:var(--royal);margin-bottom:8px;text-transform:uppercase;letter-spacing:.03em}
+.summary-text{margin:0;font-size:18px;line-height:1.45}
+.bullets{margin:8px 0 0 20px;padding:0}
+.bullets li{margin:0 0 8px;line-height:1.35}
+.tools{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.print-action{background:#fff;border:2px solid var(--sky);color:var(--royal);border-radius:14px;min-height:56px;width:100%;font-weight:850;font-size:18px;margin-top:12px}
+.print-only{display:none}
+.print-paper{display:none}
+@media(prefers-reduced-motion:reduce){.fill{transition:none}.option:active,.primary:active{transform:none}}
+@media print{
+ body{background:white;color:black}
+ .shell{display:none}
+ .print-only{display:block;padding:10mm 12mm;font-family:Arial,sans-serif;color:#111}
+ .print-only h1{font-size:23pt;margin:0 0 6pt}
+ .print-only h2{font-size:14pt;margin:16pt 0 6pt}
+ .print-only p,.print-only li{font-size:11pt;line-height:1.38}
+ .print-only .printed-block{border:1px solid #aaa;border-radius:4px;padding:9pt 12pt;margin:8pt 0;white-space:pre-wrap;overflow-wrap:anywhere}
+ .print-only .print-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+ .print-only .print-square{border:1px solid black;min-height:110px;padding:11px;font-size:11pt;line-height:1.25;break-inside:avoid}
+ .print-only.paper-mode .print-summary{display:none}
+ .print-only.summary-mode .print-paper{display:none}
+ .print-only.paper-mode .print-paper{display:block}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <button id="back" class="backtop" aria-label="Previous screen">‹</button>
+    <div class="bar" aria-label="Progress"><div class="fill" id="fill"></div></div>
+    <span class="count" id="count">0 / 3</span>
+  </div>
+  <main class="content" id="content" aria-live="polite"></main>
+  <div class="footer" id="foot"></div>
+</div>
+<section class="print-only summary-mode" id="printArea">
+  <div class="print-summary" id="printSummary"></div>
+  <div class="print-paper">
+    <h1>FWP CoP — Knowledge Connections</h1>
+    <p>Listen to your colleagues. Tick any statement that matches what you heard. Aim for at least 3 connections. More is even better.</p>
+    <div class="print-grid" id="printGrid"></div>
+    <p><b>Things to note:</b> ___________________________________________________________</p>
+    <p><b>What I will try:</b> _________________________________________________________________</p>
+  </div>
+</section>
+<script>
+'use strict';
+const prompts=[
+  'We faced the same problem',
+  'Someone tried a new idea',
+  'Someone solved a problem I have',
+  'We tried something similar',
+  'I learned something new',
+  'Someone mentioned a future problem',
+  'Someone had a different view',
+  'I heard a practice I could try',
+  'We found something in common'
+];
+const nextMoves=[
+  ['🌱','Try a practice'],
+  ['🔧','Adapt an idea'],
+  ['💬','Ask a colleague for advice'],
+  ['🔎','Learn more about an approach']
+];
+const $=id=>document.getElementById(id);
+let page=0,checks=new Set(),moves=new Set(),notes1='',notes2='',notes3='';
+const KEY='fwp-cop-friendly-v3';
+try{
+  const s=JSON.parse(localStorage.getItem(KEY)||'null');
+  if(s){
+    page=Number.isInteger(s.page)&&s.page>=0&&s.page<=6?s.page:0;
+    checks=new Set(Array.isArray(s.checks)?s.checks.filter(n=>Number.isInteger(n)&&n>=0&&n<9):[]);
+    moves=new Set(Array.isArray(s.moves)?s.moves.filter(n=>Number.isInteger(n)&&n>=0&&n<4):[]);
+    notes1=typeof s.notes1==='string'?s.notes1.slice(0,2500):'';
+    notes2=typeof s.notes2==='string'?s.notes2.slice(0,2500):'';
+    notes3=typeof s.notes3==='string'?s.notes3.slice(0,2500):'';
+  }
+}catch(e){}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify({page,checks:[...checks],moves:[...moves],notes1,notes2,notes3}))}catch(e){}
+}
+function escapeHtml(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function mosaic(){
+  return '<div class="hero-card"><div class="tile-grid">'+
+    '<div class="tile yellow ring"></div>'+
+    '<div class="tile green heart"></div>'+
+    '<div class="tile sky dots"></div>'+
+    '<div class="tile royal diamond"></div>'+
+    '<div class="tile royal dots green-dots"></div>'+
+    '<div class="tile sky diamond"></div>'+
+    '<div class="tile yellow heart" style="--heart:white"></div>'+
+    '<div class="tile green ring"></div>'+
+  '</div><div class="hero-band"><strong>Family Welfare Programme</strong><span>Learn from one another. Find useful practices. Bring one idea back to your own work.</span></div></div>';
+}
+function emblem(){
+  return '<div class="bigdone"><div class="emblem">'+
+    '<div class="tile yellow ring"></div>'+
+    '<div class="tile green heart"></div>'+
+    '<div class="tile sky dots"></div>'+
+    '<div class="tile royal diamond"></div>'+
+  '</div></div>';
+}
+function addNotes(title,placeholder,value,key){
+  const label=document.createElement('label');label.className='fieldlabel';label.htmlFor=key;label.textContent=title;$('content').append(label);
+  const help=document.createElement('p');help.className='fieldhint';help.textContent='Optional — write a few words, or leave blank.';$('content').append(help);
+  const t=document.createElement('textarea');
+  t.id=key;t.placeholder=placeholder;t.maxLength=2500;t.value=value;
+  t.addEventListener('input',()=>{if(key==='notes1')notes1=t.value;else if(key==='notes2')notes2=t.value;else notes3=t.value;save()});
+  $('content').append(t);
+}
+function tierText(n){
+  if(n>=7)return '🌟 Excellent! You found many useful connections.';
+  if(n>=5)return '🎉 Wonderful! You are seeing many shared lessons.';
+  if(n>=4)return '👏 Great! More than four connections found.';
+  if(n>=3)return '✓ Good work! You reached the goal.';
+  return 'Keep listening and marking what you hear.';
+}
+function printNow(mode){$('printArea').className='print-only '+(mode==='paper'?'paper-mode':'summary-mode');fillPrint();window.print()}
+function fillPrint(){
+  const chosen=[...checks].sort((a,b)=>a-b).map(i=>prompts[i]);
+  const actions=[...moves].sort((a,b)=>a-b).map(i=>nextMoves[i][1]);
+  const part=v=>'<div class="printed-block">'+escapeHtml(v||'No notes entered.')+'</div>';
+  $('printSummary').innerHTML=
+    '<h1>Your learning summary</h1>'+
+    '<p>Family Welfare Programme • Community of Practice</p>'+
+    '<h2>About a Community of Practice</h2>'+
+    '<p>A Community of Practice brings people doing similar work together to share practical experience, learn from one another, and improve what they do. It helps people learn, adapt, and strengthen practice.</p>'+
+    '<h2>Task 1 — My 1 win and 1 challenge</h2>'+part(notes1)+
+    '<h2>Task 2 — What do we know together?</h2>'+
+    '<p><b>'+checks.size+' connections checked</b></p>'+
+    (chosen.length?'<ul>'+chosen.map(c=>'<li>'+escapeHtml(c)+'</li>').join('')+'</ul>':'<p>No connections marked.</p>')+
+    '<p><b>Things to note</b></p>'+part(notes2)+
+    '<h2>Task 3 — What can I do differently now?</h2>'+
+    (actions.length?'<ul>'+actions.map(a=>'<li>'+escapeHtml(a)+'</li>').join('')+'</ul>':'<p>No next moves selected.</p>')+
+    '<p><b>My quick notes</b></p>'+part(notes3)+
+    '<h2>Takeaway</h2>'+
+    '<p>What I knew was valuable. What I learned from other practitioners can help me improve my own FWP practice.</p>';
+}
+function go(n){page=n;save();draw();window.scrollTo({top:0,behavior:'instant'})}
+function button(label,fn,disabled=false){const b=document.createElement('button');b.className='primary';b.textContent=label;b.disabled=disabled;b.addEventListener('click',fn);$('foot').appendChild(b)}
+function small(label,fn){const b=document.createElement('button');b.className='secondary';b.textContent=label;b.onclick=fn;$('foot').appendChild(b)}
+function addChoice(label,i,kind){
+  const b=document.createElement('button');
+  const active=kind==='checks'?checks.has(i):moves.has(i);
+  b.className='option'+(active?' selected':'');
+  b.setAttribute('aria-pressed',active);
+  b.innerHTML='<span class="tick" aria-hidden="true">✓</span><span></span>';
+  b.lastChild.textContent=label;
+  b.onclick=()=>{if(kind==='checks'){checks.has(i)?checks.delete(i):checks.add(i)}else{moves.has(i)?moves.delete(i):moves.add(i)}save();draw(false)};
+  return b;
+}
+function setup(eyebrow,heading,description){
+  $('content').innerHTML='';
+  const e=document.createElement('div');e.className='eyebrow';e.textContent=eyebrow;$('content').append(e);
+  const h=document.createElement('h1');h.textContent=heading;$('content').append(h);
+  if(description){const p=document.createElement('p');p.className='sub';p.textContent=description;$('content').append(p)}
+}
+function block(main,desc){
+  const div=document.createElement('div');div.className='bubble';
+  const s=document.createElement('strong');s.textContent=main;div.append(s);
+  if(desc){const p=document.createElement('p');p.textContent=desc;div.append(p)}
+  $('content').append(div);
+}
+function renderOptions(kind,arr){const c=document.createElement('div');c.className='options';arr.forEach((s,i)=>c.append(addChoice(typeof s==='string'?s:s.join('  '),i,kind)));$('content').append(c)}
+function summaryBullets(items){return items.length?'<ul class="bullets">'+items.map(t=>'<li>'+escapeHtml(t)+'</li>').join('')+'</ul>':'<p class="summary-text">None selected.</p>'}
+function draw(){
+  $('foot').innerHTML='';
+  $('back').style.visibility=page===0?'hidden':'visible';
+  $('back').onclick=()=>go(Math.max(0,page-1));
+  const progress=page===0?0:page<=2?1:page<=4?2:3;
+  $('fill').style.width=(progress/3*100)+'%';
+  $('count').textContent=progress+' / 3';
+
+  if(page===0){
+    setup('FWP COMMUNITY OF PRACTICE','Learn better, together.','Three small activities. Real conversations. Useful ideas.');
+    $('content').insertAdjacentHTML('beforeend',mosaic());
+    block('You do not need to type much.','Listen, share, tap, and move forward one screen at a time.');
+    const note=document.createElement('div');note.className='note-box';note.textContent='This activity helps you see the value of learning from other practitioners.';$('content').append(note);
+    button('LET’S START',()=>go(1));
+  }
+  if(page===1){
+    setup('TASK 1 OF 3','What is 1 win and 1 challenge?','Start with your own experience.');
+    block('Share 1 win and 1 challenge from your FWP work.','Your win is something that worked well. Your challenge is something difficult, unresolved, or still improving. Take turns sharing out loud.');
+    addNotes('My 1 win and 1 challenge (optional)','My win: ...  My challenge: ...',notes1,'notes1');
+    button('WE HAVE SHARED',()=>go(2));
+  }
+  if(page===2){
+    setup('TASK 1 COMPLETE','Good start!','Everyone brings both wins and challenges.');
+    $('content').insertAdjacentHTML('beforeend',emblem());
+    block('Both wins and challenges are useful.','Now listen for what you can learn from one another.');
+    button('CONTINUE',()=>go(3));
+  }
+  if(page===3){
+    setup('TASK 2 OF 3','What do we know together?','As people share, tap any statement that matches what you heard. Aim for at least 3. More is even better.');
+    const st=document.createElement('div');st.className='status';st.textContent=checks.size+' connections checked';$('content').append(st);
+    const tier=document.createElement('p');tier.className='tier';tier.textContent=tierText(checks.size);$('content').append(tier);
+    renderOptions('checks',prompts);
+    addNotes('Things to note','What was interesting? What surprised you? What idea may help you later?',notes2,'notes2');
+    if(checks.size>=3){const ok=document.createElement('div');ok.className='success';ok.innerHTML='<strong>✓ You reached the goal!</strong><p>You can continue checking more connections, or move to the next task.</p>';$('content').append(ok)}
+    button(checks.size>=3?'CONTINUE':'CHECK AT LEAST 3 TO CONTINUE',()=>go(4),checks.size<3);
+    small('Print the connection activity',()=>printNow('paper'));
+  }
+  if(page===4){
+    setup('TASK 2 COMPLETE','Look what you found!','Your table holds many different experiences.');
+    $('content').insertAdjacentHTML('beforeend',emblem());
+    block('Different people. Different lessons. More possibilities.','Now choose one or more actions you want to take forward.');
+    button('CONTINUE',()=>go(5));
+  }
+  if(page===5){
+    setup('TASK 3 OF 3','What can I do differently now?','Think about what you heard from other practitioners.');
+    block('Which next steps could help you?','Select one or more. Then share your choices with your table.');
+    renderOptions('moves',nextMoves);
+    if(moves.size){const r=document.createElement('div');r.className='success';r.innerHTML='<strong>✓ Your next moves</strong><p>'+[...moves].sort((a,b)=>a-b).map(i=>escapeHtml(nextMoves[i][1])).join(' • ')+'</p>';$('content').append(r)}
+    addNotes('My quick notes','What will I try? With whom? What do I want to remember?',notes3,'notes3');
+    button(moves.size===0?'CHOOSE AT LEAST ONE':'FINISH',()=>go(6),moves.size===0);
+  }
+  if(page===6){
+    setup('ALL 3 TASKS COMPLETE','You did it!','Your learning can continue after today.');
+    $('content').insertAdjacentHTML('beforeend',mosaic());
+    const q=document.createElement('div');q.className='final-quote';q.textContent='You came with what you knew. You leave with what others know, too.';$('content').append(q);
+    const p=document.createElement('p');p.textContent='A Community of Practice helps practitioners share experiences, learn from each other, and adapt useful practices to their own work.';$('content').append(p);
+    const selectedConnections=[...checks].sort((a,b)=>a-b).map(i=>prompts[i]);
+    const selectedMoves=[...moves].sort((a,b)=>a-b).map(i=>nextMoves[i][1]);
+    const card=document.createElement('div');card.className='summary-card';
+    card.innerHTML=''+
+      '<div class="summary-head"><strong>Your learning summary</strong><span>'+checks.size+' connections checked</span></div>'+
+      '<div class="summary-body">'+
+        '<div class="summary-block"><span class="summary-label">Connections I noticed</span>'+summaryBullets(selectedConnections)+'</div>'+
+        '<div class="summary-block"><span class="summary-label">Things to note</span><p class="summary-text" style="white-space:pre-wrap">'+escapeHtml(notes2||'No notes added')+'</p></div>'+
+        '<div class="summary-block"><span class="summary-label">My next moves</span>'+summaryBullets(selectedMoves)+'</div>'+
+        '<div class="summary-block"><span class="summary-label">My quick notes</span><p class="summary-text" style="white-space:pre-wrap">'+escapeHtml(notes3||'No notes added')+'</p></div>'+
+      '</div>';
+    $('content').append(card);
+    button('PRINT MY KEY TAKEAWAYS',()=>printNow('summary'));
+    small('Back to Task 3',()=>go(5));
+    small('Start over',()=>{if(confirm('Start from the beginning and clear your answers?')){checks.clear();moves.clear();notes1='';notes2='';notes3='';go(0)}});
+  }
+}
+$('printGrid').innerHTML=prompts.map(t=>'<div class="print-square">☐ '+t+'</div>').join('');
+fillPrint();
+draw();
+</script>
+</body>
+</html>
