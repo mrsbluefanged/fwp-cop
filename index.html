@@ -228,7 +228,29 @@ function fillPrint(){
     '<h2>Takeaway</h2>'+
     '<p>What I knew was valuable. What I learned from other practitioners can help me improve my own FWP practice.</p>';
 }
-function go(n){page=n;save();draw();window.scrollTo({top:0,behavior:'instant'})}
+// Give every activity screen a real browser-history entry.
+// This lets the phone's Back button return to the previous task/screen.
+function go(n){
+  n=Math.max(0,Math.min(6,n));
+  if(n===page)return;
+  if(n===page-1){
+    history.back();
+    return;
+  }
+  page=n;
+  history.pushState({fwpPage:page},'');
+  save();
+  draw();
+  window.scrollTo(0,0);
+}
+window.addEventListener('popstate',event=>{
+  if(event.state && Number.isInteger(event.state.fwpPage)){
+    page=event.state.fwpPage;
+    save();
+    draw();
+    window.scrollTo(0,0);
+  }
+});
 function button(label,fn,disabled=false){const b=document.createElement('button');b.className='primary';b.textContent=label;b.disabled=disabled;b.addEventListener('click',fn);$('foot').appendChild(b)}
 function small(label,fn){const b=document.createElement('button');b.className='secondary';b.textContent=label;b.onclick=fn;$('foot').appendChild(b)}
 function addChoice(label,i,kind){
@@ -258,7 +280,7 @@ function summaryBullets(items){return items.length?'<ul class="bullets">'+items.
 function draw(){
   $('foot').innerHTML='';
   $('back').style.visibility=page===0?'hidden':'visible';
-  $('back').onclick=()=>go(Math.max(0,page-1));
+  $('back').onclick=()=>{if(page>0)history.back()};
   const progress=page===0?0:page<=2?1:page<=4?2:3;
   $('fill').style.width=(progress/3*100)+'%';
   $('count').textContent=progress+' / 3';
@@ -328,6 +350,18 @@ function draw(){
     small('Start over',()=>{if(confirm('Start from the beginning and clear your answers?')){checks.clear();moves.clear();notes1='';notes2='';notes3='';go(0)}});
   }
 }
+// Restore the screen on refresh, and establish back-navigation entries
+// for a returning participant whose progress was previously saved.
+try{
+  if(history.scrollRestoration)history.scrollRestoration='manual';
+  if(history.state && Number.isInteger(history.state.fwpPage)){
+    page=Math.max(0,Math.min(6,history.state.fwpPage));
+  }else{
+    const restoredPage=page;
+    history.replaceState({fwpPage:0},'');
+    for(let i=1;i<=restoredPage;i++)history.pushState({fwpPage:i},'');
+  }
+}catch(e){}
 $('printGrid').innerHTML=prompts.map(t=>'<div class="print-square">☐ '+t+'</div>').join('');
 fillPrint();
 draw();
